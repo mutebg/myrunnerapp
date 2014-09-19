@@ -1,0 +1,161 @@
+/* Empty. Add your own CSS if you like */
+ion-view.pane {
+	background: #fff url(../img/bg.png);
+	background-size: cover;
+}
+
+.no-bg {
+	background: none !important;
+	background-image: none !important;
+}
+
+.my-footer {
+	bottom: 0;
+	border-top-width: 1px;
+	border-bottom-width: 0;
+	background-position: top;
+	padding: 0;
+
+	-webkit-transform: translate3d(0, 0, 0);
+	-moz-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	position: absolute;
+	right: 0;
+	left: 0;
+	z-index: 10;
+	box-sizing: border-box;
+	width: 100%;
+	height: 47px;
+	border-width: 0;
+	border-style: solid;
+	border-top: 1px solid transparent;
+	border-bottom: 1px solid #ddd;
+	background-color: white;
+	/* border-width: 1px will actually create 2 device pixels on retina; */
+	background-size: 0;
+
+}
+
+.slider {
+	height: 100vh;
+	text-align: center;
+}
+
+.slider .slider-slide {
+	background-position: center bottom;
+	background-size: cover;
+	position: relative;
+}
+
+.slider .slider-slide.run{
+	background-image: url(../img/bg-run.jpg);
+}
+
+.slider .slider-slide.bike{
+	background-image: url(../img/bg-bike.jpg);
+}
+
+.slider .slider-slide.walk{
+	background-image: url(../img/bg-walk.jpg);
+}
+
+.slider h1 {
+	margin-top: 100px;
+	position: absolute;
+	bottom: 20%;
+	width: 100%;
+	text-align: center;
+	font-size: 60px;
+	color: #145fd7;
+}
+
+.slider-pager {
+	display: none;
+}
+
+.circle-container {
+	text-align: center;
+}
+
+.circle-group {
+	display: flex;
+	flex-flow: row wrap;
+  	justify-content: space-around;
+	align-items: center;
+}
+
+.circle {
+	background: rgba(68, 68, 68, 0.02);
+	border-radius: 50%;
+	align-self: center;
+	position: relative;
+}
+
+.circle.distance {
+	border-color: #43cee6;
+	color: #43cee6;;
+}
+
+.circle.speed {
+	border-color: #f0b840;
+	color: #f0b840;
+}
+
+.circle.time {
+	border-color: #66cc33;
+	color: #66cc33;
+}
+
+.circle.energy {
+	border-color: #ef4e3a;
+	color: #ef4e3a;
+}
+
+.circle-big {
+	width: 80%;
+	height: 0;
+	padding-bottom: 80%;
+	margin: 2em auto;
+	border: 1px solid;
+}
+
+.circle-small {
+	border: 1px solid;
+	width: 30%;
+	height: 0;
+	padding-bottom: 29%;
+}
+
+.circle-content {
+	position: absolute; 
+	top: 0;
+	left: 0;
+    height:100%; 
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.circle-small .value {
+	font-weight: bold;
+	font-size: 26px;	
+	margin: 4px 0 1px 0;
+}
+
+.circle-big .value {
+	font-weight: bold;
+	font-size: 64px;
+	margin: 26px 0 20px 0;
+}
+
+.circle-big .help,
+.circle-big .unit {
+	font-size: 24px;
+}

@@ -1,0 +1,122 @@
+<ion-view title="Тренировка">
+	<ion-nav-buttons side="left">
+    	<button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+  	</ion-nav-buttons>
+  	<ion-content class="has-header">
+
+		<div ng-switch="state">
+			<!-- RUN SCREEN -->
+			<div class="circle-container" ng-switch-when="run">
+
+				<div class="circle circle-big" 
+					ng-class="currentCircle" 
+					ng-switch="currentCircle">
+					<div class="circle-content" ng-switch-when="distance">
+						<div class="help">разтояние</div>
+						<div class="value">{{ data.distance | m }}</div>
+						<div class="unit">метра</div>
+					</div>
+					<div class="circle-content" ng-switch-when="time">
+						<div class="help">време</div>
+						<div class="value">{{ data.time | mmss }}</div>
+						<div class="unit">минути</div>
+					</div>
+					<div class="circle-content" ng-switch-when="energy">
+						<div class="help">енергия</div>
+						<div class="value">{{ data.energy }}</div>
+						<div class="unit">калории</div>
+					</div>
+					<div class="circle-content" ng-switch-when="speed">
+						<div class="help">скорост</div>
+						<div class="value">{{ data.speed | kmh }}</div>
+						<div class="unit">км.ч.</div>
+					</div>
+				</div>
+				
+				<div class="circle-group">
+					<div class="circle circle-small distance" 
+						ng-click=" currentCircle = 'distance' "
+						ng-hide=" currentCircle == 'distance' "
+						>
+						<div class="circle-content">
+							<div class="help">разтояние</div>
+							<div class="value">{{ data.distance | m }}</div>
+							<div class="unit">метра</div>
+						</div>
+					</div>
+					<div class="circle circle-small time"
+						ng-click=" currentCircle = 'time' "
+						ng-hide=" currentCircle == 'time' "
+						>
+						<div class="circle-content">
+							<div class="help">време</div>
+							<div class="value">{{ data.time | mmss }}</div>
+							<div class="unit">минути</div>
+						</div>	
+					</div>
+					<div class="circle circle-small energy"
+						ng-click=" currentCircle = 'energy' "
+						ng-hide=" currentCircle == 'energy' "
+						>
+						<div class="circle-content">
+							<div class="help">енергия</div>
+							<div class="value">{{ data.energy }}</div>
+							<div class="unit">калории</div>
+						</div>
+					</div>
+					<div class="circle circle-small speed"
+						ng-click="currentCircle = 'speed'"
+						ng-hide=" currentCircle == 'speed' "
+						>
+						<div class="circle-content">
+							<div class="help">скорост</div>
+							<div class="value">{{ data.speed | kmh }}</div>
+							<div class="unit">км.ч.</div>
+						</div>	
+					</div>
+				</div>
+			</div>
+			
+
+			<!-- FINISH SCREEN -->
+			<div ng-switch-when="finish">
+				<h1>finish</h1>
+			</div>	
+
+			<!-- START SCREEN -->
+  			<div ng-switch-default>
+				<ion-slide-box on-slide-changed="changeSport($index)">
+					<ion-slide ng-repeat="w in workouts" ng-class="w.tag">
+				    	<h1>{{w.name}}</h1>
+				   	</ion-slide>
+				</ion-slide-box>
+			</div>
+		</div>
+
+
+  	</ion-content>
+  	<div class="my-footer bar-assertive" ng-switch="state">
+		<!-- RUN SCREEN -->
+		<div ng-switch-when="run">
+			<div class="button-bar">
+				<button class="button button-assertive" ng-click="stop()">Стоп</button>
+				<button class="button button-dark" ng-click="pause()">{{ pauseBtn }}</button>
+			</div>
+		</div>
+			
+
+		<!-- FINISH SCREEN -->
+		<div ng-switch-when="finish">
+			<div class="button-bar">
+				<button ng-click="save()" class="button button-balanced">Запази</button>
+			</div>
+		</div>	
+
+		<!-- START SCREEN -->
+		<div ng-switch-default>
+			<div class="button-bar">
+				<button ng-click="start()" class="button button-positive">Започни {{workout}}</button>
+			</div>
+		</div>	
+	</div>
+</ion-view>
