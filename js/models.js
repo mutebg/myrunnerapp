@@ -1,11 +1,11 @@
-var RunnerFactory = function ($interval) {
-	var factory = {};
-	factory.watchID = null;
-	factory.running = false;
-	factory.timer;
-	factory.temp;
-	factory.data = {};
-	factory.resetData = {
+app.factory('RunServ', function ($interval) {
+	var self = {};
+	self.watchID = null;
+	self.running = false;
+	self.timer;
+	self.temp;
+	self.data = {};
+	self.resetData = {
 		'start_at': null,
 		'end_at': null,
 		'speed': 0,
@@ -14,30 +14,30 @@ var RunnerFactory = function ($interval) {
 		'track': []
 	}
 
-	factory.reset = function() {
-		navigator.geolocation.clearWatch( factory.watchID );	
-		$interval.cancel( factory.timer );
-		factory.temp = null;
-		factory.watchID = null;
-		factory.timer = null;
-		factory.running = false;
-		factory.data = factory.resetData;
+	self.reset = function() {
+		navigator.geolocation.clearWatch( self.watchID );	
+		$interval.cancel( self.timer );
+		self.temp = null;
+		self.watchID = null;
+		self.timer = null;
+		self.running = false;
+		self.data = self.resetData;
 	}
 
-	factory.start = function(){
-		factory.reset();
+	self.start = function(){
+		self.reset();
 
-		factory.data.seconds = 0;
+		self.data.seconds = 0;
 
-		factory.running = true;
-		factory.data.start_at = new Date().getTime();
-		factory.timer = $interval( function(){
-			if ( factory.running ) {
-				factory.data.seconds = factory.data.seconds + 1;
+		self.running = true;
+		self.data.start_at = new Date().getTime();
+		self.timer = $interval( function(){
+			if ( self.running ) {
+				self.data.seconds = self.data.seconds + 1;
 			}
 		}, 1000);
 
-		factory.watchID = navigator.geolocation.watchPosition( 
+		self.watchID = navigator.geolocation.watchPosition( 
             function(position) {
                 var data = {
                     'lat': 		position.coords.latitude,
@@ -46,16 +46,16 @@ var RunnerFactory = function ($interval) {
                     'time': 	position.timestamp
                 }
 
-                if ( factory.running ) {
-                    if ( factory.temp ) {
-                    	var km = factory
-                			.getDistanceFromLatLonInKm(factory.temp.lat, factory.temp.lng, data.lat, data.lng);
-                		factory.data.km += km;
+                if ( self.running ) {
+                    if ( self.temp ) {
+                    	var km = self
+                			.getDistanceFromLatLonInKm(self.temp.lat, self.temp.lng, data.lat, data.lng);
+                		self.data.km += km;
                 	}	
 
-                	factory.data.speed = data.speed;
-                    factory.data.track.push(data);
-                    factory.temp = data;
+                	self.data.speed = data.speed;
+                    self.data.track.push(data);
+                    self.temp = data;
                 }
             }, 
             function(error) {
@@ -67,24 +67,24 @@ var RunnerFactory = function ($interval) {
             });
 	}
 
-	factory.pause = function() {
-		factory.running = ! factory.running;
-		return factory.running;
+	self.pause = function() {
+		self.running = ! self.running;
+		return self.running;
 	}
 
-	factory.stop = function(){
-		navigator.geolocation.clearWatch( factory.watchID );
-		factory.running = false;
-		factory.data.end_at = new Date().getTime();
-		$interval.cancel( factory.timer );
+	self.stop = function(){
+		navigator.geolocation.clearWatch( self.watchID );
+		self.running = false;
+		self.data.end_at = new Date().getTime();
+		$interval.cancel( self.timer );
 	}
 
-	factory.getTrack = function() {
-		return factory.data;
+	self.getTrack = function() {
+		return self.data;
 	}
 
-	factory.getData = function() {
-		var lastData = factory.data;
+	self.getData = function() {
+		var lastData = self.data;
 		return {
 			'speed': lastData.speed,
 			'distance': lastData.km,
@@ -93,24 +93,122 @@ var RunnerFactory = function ($interval) {
 		}
 	}
 
-	factory.getDistanceFromLatLonInKm = function(lat1,lon1,lat2,lon2) {
+	self.getDistanceFromLatLonInKm = function(lat1,lon1,lat2,lon2) {
 		var R = 6371; // Radius of the earth in km
-		var dLat = factory.deg2rad(lat2-lat1);  // deg2rad below
-		var dLon = factory.deg2rad(lon2-lon1); 
+		var dLat = self.deg2rad(lat2-lat1);  // deg2rad below
+		var dLon = self.deg2rad(lon2-lon1); 
 		var a = 
 			Math.sin(dLat/2) * Math.sin(dLat/2) +
-			Math.cos(factory.deg2rad(lat1)) * Math.cos(factory.deg2rad(lat2)) * 
+			Math.cos(self.deg2rad(lat1)) * Math.cos(self.deg2rad(lat2)) * 
 			Math.sin(dLon/2) * Math.sin(dLon/2); 
 		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
 		var d = R * c; // Distance in km
 		return d;
 	}
 
-	factory.deg2rad = function(deg) {
+	self.deg2rad = function(deg) {
 	  return deg * (Math.PI/180)
 	}
 
-	return factory;	
-};	
+	return self;
+});
 
-app.factory('RunServ', ['$interval', RunnerFactory]);
+app.factory('DB', function ($q) {
+    var self = this;
+    self.db = null;
+ 	self.tables = [
+      	{
+            name: 'workouts',
+            columns: [
+                {name: 'id', type: 'integer primary key'},
+                {name: 'type', type: 'text'},
+                {name: 'added', type: 'integer'},
+                {name: 'seconds', type: 'integer'},
+                {name: 'track', type: 'text'},
+                {name: 'distance', type: 'integer'},
+                {name: 'sync', type: 'integer'}
+            ]
+        }
+    ]
+
+    self.init = function() {
+        self.db = window.openDatabase('myrunner', '1.0', 'database', -1);
+ 		angular.forEach(self.tables, function(table) {
+            var columns = [];
+ 			
+            angular.forEach(table.columns, function(column) {
+                columns.push(column.name + ' ' + column.type);
+            });
+ 
+            var query = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') + ')';
+            self.query(query);
+            console.log('Table ' + table.name + ' initialized');
+        });
+    };
+ 
+    self.query = function(query, bindings) {
+        bindings = typeof bindings !== 'undefined' ? bindings : [];
+        var deferred = $q.defer();
+
+       	self.db.transaction(function(transaction) {
+            transaction.executeSql(query, bindings, function(transaction, result) {
+                deferred.resolve(result);
+            }, function(transaction, error) {
+            	console.log(transaction, error);
+     			deferred.reject(error);
+            });
+        });
+ 
+        return deferred.promise;
+    };
+ 
+    self.fetchAll = function(result) {
+        var output = [];
+ 
+        for (var i = 0; i < result.rows.length; i++) {
+            output.push(result.rows.item(i));
+        }
+        
+        return output;
+    };
+ 
+    self.fetch = function(result) {
+        return result.rows.item(0);
+    };
+ 
+    return self;
+});
+
+app.factory('Workouts', function (DB) {
+	var self = this;
+	self.all = function() {
+		console.log('all');
+        return DB.query('SELECT * FROM workouts')
+        .then( function( result ){
+            return DB.fetchAll( result );
+        });
+    };
+
+    self.get = function(id) {
+        return DB.query('SELECT * FROM workouts WHERE id = ?', [id])
+        .then(function(result){
+            return DB.fetch(result);
+        });
+    };
+
+    self.remove = function(id) {
+    	DB.query('DELETE FROM workouts WHERE id = ?',[id])
+    }
+
+    self.add = function(data) {
+    	var params = [data.type, data.end_at, data.seconds, 
+    		JSON.stringify(data.track), data.km];
+    	
+    	//var params = ['run', 10, 20, 'test', 10];
+    	var sql = 'INSERT INTO workouts (type, added, seconds, track, distance) ' + 
+    		'VALUES (?, ?, ?, ?, ?)';
+    	DB.query(sql, params)
+    }
+
+    return self;
+});

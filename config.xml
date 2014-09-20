@@ -31,9 +31,14 @@
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
-
+  
+  <!--
   <gap:plugin name="org.apache.cordova.geolocation" version="0.3.7" />
   <gap:plugin name="org.apache.cordova.splashscreen" version="0.2.7" />
+-->
+  <gap:plugin name="org.apache.cordova.splashscreen" />
+  <gap:plugin name="org.apache.cordova.geolocation" />
+
 
   <!-- iPhone / iPod Touch  -->
   <!--

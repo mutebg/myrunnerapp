@@ -1,15 +1,9 @@
-// Ionic Starter App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.controllers' is found in controllers.js
 var app = angular.module('runner', ['ionic']);
 
-app.run(function($ionicPlatform) {
+app.run(function($ionicPlatform, DB) {
     $ionicPlatform.ready(function() {
         //hide splashcreen
-        navigator.splashscreen.hide();
+        //navigator.splashscreen.hide();
 
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -22,6 +16,8 @@ app.run(function($ionicPlatform) {
             StatusBar.styleDefault();
         }
     });
+
+    DB.init();
 })
 
 app.config(function($stateProvider, $urlRouterProvider) {

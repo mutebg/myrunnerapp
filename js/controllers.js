@@ -1,5 +1,4 @@
-app
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+app.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -30,9 +29,9 @@ app
       $scope.closeLogin();
     }, 1000);
   };
-})
+});
 
-.controller('StartCtrl', function($scope, $interval, RunServ) {
+app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
     $scope.state = 'start';
     $scope.workouts = [
     {tag:'run', name:'бягане'}, 
@@ -51,9 +50,7 @@ app
 
         $scope.timer = $interval( function(){
             $scope.data = RunServ.getData();
-            //console.log('running interval in ctrl');
         }, 1000);
-
     }
 
     $scope.stop = function() {
@@ -62,6 +59,8 @@ app
         var track = RunServ.getTrack();
         $interval.cancel( $scope.timer );
         $scope.data = $scope.clearData;
+        track.type = $scope.workout;
+        Workouts.add(track);
     }
 
     $scope.pause = function() {
@@ -82,16 +81,22 @@ app
     }
 
     //$scope.start();
+});
+
+app.controller('HistoryCtrl', function( $scope, Workouts ) {
+    $scope.list = [];
+    Workouts.all().then( function( list ) {
+        $scope.list = list;
+    });
 })
 
-.controller('HistoryCtrl', function($scope) {
-
+app.controller('HistoryViewCtrl', function($scope, Workouts, $stateParams) {
+    $scope.workout = {};
+    Workouts.get(  $stateParams.workoutid ).then( function( workout ) {
+        $scope.workout = workout;
+    });;
 })
 
-.controller('HistoryViewCtrl', function($scope, $stateParams) {
+app.controller('ProfileCtrl', function($scope) {
 
-})
-
-.controller('ProfileCtrl', function($scope) {
-
-})
+});
