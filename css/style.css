@@ -159,3 +159,16 @@ ion-view.pane {
 .circle-big .unit {
 	font-size: 24px;
 }
+
+.icon.run {
+	background-image: url(../img/run.svg);
+	background: 32px 32px;
+}
+
+.icon.bike {
+	background-image: url(../img/bike.svg);
+}
+
+.icon.walk {
+	background-image: url(../img/walk.svg);
+}

@@ -1,8 +1,40 @@
-<ion-view title="Profile">
+<ion-view title="Профил">
 	<ion-nav-buttons side="left">
     	<button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
   	</ion-nav-buttons>
   	<ion-content class="has-header">
-    	<h1>Profile</h1>
-  	</ion-content>
+	    <div class="list">
+			<label class="item item-input">
+    			<span class="input-label">Име</span>
+    			<input type="text" ng-model="profile.name">
+  			</label>
+  			<label class="item item-input item-select">
+    			<span class="input-label">Пол</span>
+    			<select ng-model="profile.sex">
+    				<option value="m">мъж</option>
+    				<option value="f">жена</option>
+    			</select>
+  			</label>
+  			<label class="item item-input">
+    			<span class="input-label">Тегло</span>
+    			<input type="number" ng-model="profile.weight">
+  			</label>
+  			<label class="item item-input">
+    			<span class="input-label">Височина</span>
+    			<input type="number" ng-model="profile.height">
+  			</label>
+  			<label class="item item-input">
+    			<span class="input-label">Години</span>
+    			<input type="number" ng-model="profile.years">
+  			</label>
+		</div>
+		<div class="padding">
+        	
+      	</div>
+	</ion-content>
+	<div class="my-footer bar-assertive" ng-switch="state">
+		<div class="button-bar">
+			<button ng-click="save()" class="button button-positive">Запази</button>
+		</div>
+	</div>
 </ion-view>

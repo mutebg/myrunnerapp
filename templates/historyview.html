@@ -1,8 +1,40 @@
-<ion-view title="Start workout">
+<ion-view title="История {{ workout.added | date }} {{ workout.type }}">
 	<ion-nav-buttons side="left">
     	<button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
   	</ion-nav-buttons>
   	<ion-content class="has-header">
-    	<h1>HistoryView</h1>
-  	</ion-content>
+		<div class="circle-container">
+			<div class="circle circle-big distance">
+				<div class="circle-content">
+					<div class="help">разтояние</div>
+					<div class="value">{{ workout.distance | m }}</div>
+					<div class="unit">метра</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="circle-group">
+			<div class="circle circle-small time">
+				<div class="circle-content">
+					<div class="help">време</div>
+					<div class="value">{{ workout.seconds | mmss }}</div>
+					<div class="unit">минути</div>
+				</div>	
+			</div>
+			<div class="circle circle-small energy">
+				<div class="circle-content">
+					<div class="help">енергия</div>
+					<div class="value">{{ workout.energy }}</div>
+					<div class="unit">калории</div>
+				</div>
+			</div>
+			<div class="circle circle-small speed">
+				<div class="circle-content">
+					<div class="help">скорост</div>
+					<div class="value">{{ workout.speed | kmh }}</div>
+					<div class="unit">км.ч.</div>
+				</div>	
+			</div>
+		</div>
+	</ion-content>
 </ion-view>

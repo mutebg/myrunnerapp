@@ -1,43 +1,18 @@
-app.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
-  // Form data for the login modal
-  $scope.loginData = {};
-
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
-
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function() {
-    $scope.modal.hide();
-  };
-
-  // Open the login modal
-  $scope.login = function() {
-    $scope.modal.show();
-  };
-
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
-  };
+app.controller('AppCtrl', function($scope, $location, Profile) {
+    if ( ! Profile.has() ) {
+        $location.path('/app/profile');
+    }
 });
 
 app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
     $scope.state = 'start';
     $scope.workouts = [
-    {tag:'run', name:'бягане'}, 
-    {tag:'bike', name:'колоездене'},
-    {tag:'walk', name:'ходене'}];
+        {tag:'run', name:'бягане'}, 
+        {tag:'bike', name:'колоездене'},
+        {tag:'walk', name:'ходене'}
+    ];
     $scope.workout = $scope.workouts[0].name;
+    $scope.workoutTag = $scope.workouts[0].tag;
     $scope.pauseBtn = 'Пауза';
     $scope.timer = null;
     $scope.clearData = {time:0, distance:0, energy:0, speed: 0}
@@ -46,7 +21,7 @@ app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
 
     $scope.start = function() {
         $scope.state = 'run';
-        RunServ.start();
+        RunServ.start($scope.workoutTag);
 
         $scope.timer = $interval( function(){
             $scope.data = RunServ.getData();
@@ -56,11 +31,8 @@ app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
     $scope.stop = function() {
         $scope.state = 'finish';
         RunServ.stop();
-        var track = RunServ.getTrack();
         $interval.cancel( $scope.timer );
         $scope.data = $scope.clearData;
-        track.type = $scope.workout;
-        Workouts.add(track);
     }
 
     $scope.pause = function() {
@@ -73,14 +45,15 @@ app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
     }
 
     $scope.save = function() {
+        var track = RunServ.getTrack();
+        Workouts.add(track);
         $scope.state = 'start';
     }
 
     $scope.changeSport = function(index) {
         $scope.workout = $scope.workouts[index].name;
+        $scope.workoutTag = $scope.workouts[index].tag;
     }
-
-    //$scope.start();
 });
 
 app.controller('HistoryCtrl', function( $scope, Workouts ) {
@@ -88,15 +61,26 @@ app.controller('HistoryCtrl', function( $scope, Workouts ) {
     Workouts.all().then( function( list ) {
         $scope.list = list;
     });
+
+    $scope.delete = function(index) {
+        Workouts.remove( $scope.list[index].id );
+        $scope.list.splice(index, 1);
+    }
 })
 
 app.controller('HistoryViewCtrl', function($scope, Workouts, $stateParams) {
     $scope.workout = {};
     Workouts.get(  $stateParams.workoutid ).then( function( workout ) {
         $scope.workout = workout;
-    });;
+        console.log(workout);
+    });
 })
 
-app.controller('ProfileCtrl', function($scope) {
+app.controller('ProfileCtrl', function($scope, Profile) {
+    $scope.profile = Profile.get();
 
+    $scope.save = function() {
+        console.log($scope.profile);
+        Profile.update( $scope.profile );
+    }
 });

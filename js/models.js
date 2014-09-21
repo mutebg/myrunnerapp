@@ -11,6 +11,8 @@ app.factory('RunServ', function ($interval) {
 		'speed': 0,
 		'seconds': 0,
 		'km': 0,
+		'sport': '',
+		'energy': 0,
 		'track': []
 	}
 
@@ -24,12 +26,11 @@ app.factory('RunServ', function ($interval) {
 		self.data = self.resetData;
 	}
 
-	self.start = function(){
+	self.start = function(sport){
 		self.reset();
-
-		self.data.seconds = 0;
-
 		self.running = true;
+		self.data.sport = sport;
+		self.data.seconds = 0;
 		self.data.start_at = new Date().getTime();
 		self.timer = $interval( function(){
 			if ( self.running ) {
@@ -126,13 +127,14 @@ app.factory('DB', function ($q) {
                 {name: 'seconds', type: 'integer'},
                 {name: 'track', type: 'text'},
                 {name: 'distance', type: 'integer'},
+                {name: 'energy', type: 'integer'},
                 {name: 'sync', type: 'integer'}
             ]
         }
     ]
 
     self.init = function() {
-        self.db = window.openDatabase('myrunner', '1.0', 'database', -1);
+        self.db = window.openDatabase('myrunner', '1.1', 'database', -1);
  		angular.forEach(self.tables, function(table) {
             var columns = [];
  			
@@ -149,12 +151,11 @@ app.factory('DB', function ($q) {
     self.query = function(query, bindings) {
         bindings = typeof bindings !== 'undefined' ? bindings : [];
         var deferred = $q.defer();
-
        	self.db.transaction(function(transaction) {
-            transaction.executeSql(query, bindings, function(transaction, result) {
+       		transaction.executeSql(query, bindings, function(transaction, result) {
                 deferred.resolve(result);
             }, function(transaction, error) {
-            	console.log(transaction, error);
+            	console.log(error);
      			deferred.reject(error);
             });
         });
@@ -182,8 +183,7 @@ app.factory('DB', function ($q) {
 app.factory('Workouts', function (DB) {
 	var self = this;
 	self.all = function() {
-		console.log('all');
-        return DB.query('SELECT * FROM workouts')
+		return DB.query('SELECT * FROM workouts ORDER BY id DESC')
         .then( function( result ){
             return DB.fetchAll( result );
         });
@@ -201,14 +201,48 @@ app.factory('Workouts', function (DB) {
     }
 
     self.add = function(data) {
-    	var params = [data.type, data.end_at, data.seconds, 
-    		JSON.stringify(data.track), data.km];
-    	
-    	//var params = ['run', 10, 20, 'test', 10];
-    	var sql = 'INSERT INTO workouts (type, added, seconds, track, distance) ' + 
-    		'VALUES (?, ?, ?, ?, ?)';
-    	DB.query(sql, params)
+    	var params = [data.sport, data.end_at, data.seconds, 
+    		JSON.stringify(data.track), data.km, data.energy];
+    	var sql = 'INSERT INTO workouts (type, added, seconds, track, distance, energy) ' + 
+    		'VALUES (?, ?, ?, ?, ?, ?)';
+    	DB.query(sql, params);
     }
 
     return self;
 });
+
+app.factory('Profile', function(){
+    var self = this;
+
+    self.get = function() {
+        var data = localStorage.getItem('profile');
+        var profile = JSON.parse(data);
+        if ( profile == null ) {
+            profile = {name: '', sex: 'm', weight: 0, height: 0, years: 0};
+        }
+        return profile;
+    }
+
+    self.update = function(data) {
+        localStorage.setItem('profile', JSON.stringify(data));
+    }
+
+    self.has = function() {
+        return localStorage.getItem('profile') ? true : false;
+    }
+
+    return self;
+});
+
+function energyCalc(seconds, distance, weight) {
+    var sport = 0.9;
+
+    var meterPerMin = ( distance / ( seconds / 60 ) );
+    console.log(meterPerMin);
+    var VO2 = ( 3.5 + ( meterPerMin * 0.2 ) + ( meterPerMin * 0.02 * sport ) );
+    console.log(VO2);
+    var MET = VO2 / 3.5;
+    console.log(MET);
+    var energy = MET * weight;
+    return energy;
+}

@@ -3,7 +3,7 @@ var app = angular.module('runner', ['ionic']);
 app.run(function($ionicPlatform, DB) {
     $ionicPlatform.ready(function() {
         //hide splashcreen
-        //navigator.splashscreen.hide();
+        navigator.splashscreen.hide();
 
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
