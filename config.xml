@@ -65,6 +65,7 @@
   <gap:splash src="res/screens/ios/ipad-portrait.png" gap:platform="ios" width="768" height="1024" />
   <gap:splash src="res/screens/ios/ipad-portrait-2x.png" gap:platform="ios" width="1536" height="2048" />
   -->
+  <gap:splash src="splash.png" />
   <gap:splash src="res/screens/android/ldpi.png" gap:platform="android" gap:qualifier="ldpi" />
   <gap:splash src="res/screens/android/mdpi.png" gap:platform="android" gap:qualifier="mdpi" />
   <gap:splash src="res/screens/android/hdpi.png" gap:platform="android" gap:qualifier="hdpi" />
