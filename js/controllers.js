@@ -2,15 +2,13 @@ app.controller('AppCtrl', function($scope, $location, Profile) {
     if ( ! Profile.has() ) {
         $location.path('/app/profile');
     }
+
+    $scope.user = Profile.get();
 });
 
 app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
     $scope.state = 'start';
-    $scope.workouts = [
-        {tag:'run', name:'бягане'}, 
-        {tag:'bike', name:'колоездене'},
-        {tag:'walk', name:'ходене'}
-    ];
+    $scope.workouts = RunServ.getTypes();
     $scope.workout = $scope.workouts[0].name;
     $scope.workoutTag = $scope.workouts[0].tag;
     $scope.pauseBtn = 'Пауза';
@@ -32,7 +30,7 @@ app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
         $scope.state = 'finish';
         RunServ.stop();
         $interval.cancel( $scope.timer );
-        $scope.data = $scope.clearData;
+        //$scope.data = $scope.clearData;
     }
 
     $scope.pause = function() {
@@ -45,6 +43,7 @@ app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
     }
 
     $scope.save = function() {
+        $scope.data = $scope.clearData;
         var track = RunServ.getTrack();
         Workouts.add(track);
         $scope.state = 'start';
@@ -68,11 +67,15 @@ app.controller('HistoryCtrl', function( $scope, Workouts ) {
     }
 })
 
-app.controller('HistoryViewCtrl', function($scope, Workouts, $stateParams) {
+app.controller('HistoryViewCtrl', function($scope, $stateParams, Workouts, RunServ) {
     $scope.workout = {};
     Workouts.get(  $stateParams.workoutid ).then( function( workout ) {
         $scope.workout = workout;
-        console.log(workout);
+        $scope.workout.type_name = RunServ.getType(workout.type).name;
+        /*var track = JSON.parse( workout.track );
+        angular.forEach(track, function(value, key) {
+
+        });*/
     });
 })
 
@@ -80,7 +83,6 @@ app.controller('ProfileCtrl', function($scope, Profile) {
     $scope.profile = Profile.get();
 
     $scope.save = function() {
-        console.log($scope.profile);
         Profile.update( $scope.profile );
     }
 });

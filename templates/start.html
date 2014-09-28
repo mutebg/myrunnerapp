@@ -6,30 +6,42 @@
 
 		<div ng-switch="state">
 			<!-- RUN SCREEN -->
-			<div class="circle-container" ng-switch-when="run">
+			<div class="circle-container" ng-switch-default>
 
 				<div class="circle circle-big" 
 					ng-class="currentCircle" 
 					ng-switch="currentCircle">
-					<div class="circle-content" ng-switch-when="distance">
-						<div class="help">разтояние</div>
-						<div class="value">{{ data.distance | m }}</div>
-						<div class="unit">метра</div>
+					<div ng-switch-when="distance">
+						<div class="circle-content">
+							<div class="help">разтояние</div>
+							<div class="value">{{ data.distance | m }}</div>
+							<div class="unit">метра</div>
+						</div>
+						<piecircle pcurrent="data.distance % 1000" pmax="1000" pborder="'#43cee6'"></piecircle>
 					</div>
-					<div class="circle-content" ng-switch-when="time">
-						<div class="help">време</div>
-						<div class="value">{{ data.time | mmss }}</div>
-						<div class="unit">минути</div>
+					<div ng-switch-when="time">
+						<div class="circle-content">
+							<div class="help">време</div>
+							<div class="value">{{ data.time | mmss }}</div>
+							<div class="unit">минути</div>
+						</div>
+						<piecircle pcurrent="data.time % 60" pmax="60" pborder="'#66cc33'"></piecircle>
 					</div>
-					<div class="circle-content" ng-switch-when="energy">
-						<div class="help">енергия</div>
-						<div class="value">{{ data.energy }}</div>
-						<div class="unit">калории</div>
+					<div ng-switch-when="energy">
+						<div class="circle-content">
+							<div class="help">енергия</div>
+							<div class="value">{{ data.energy }}</div>
+							<div class="unit">калории</div>
+						</div>
+						<piecircle pcurrent="data.energy" pmax="500" pborder="'#ef4e3a'"></piecircle>
 					</div>
-					<div class="circle-content" ng-switch-when="speed">
-						<div class="help">скорост</div>
-						<div class="value">{{ data.speed | kmh }}</div>
-						<div class="unit">км.ч.</div>
+					<div ng-switch-when="speed">
+						<div class="circle-content">
+							<div class="help">скорост</div>
+							<div class="value">{{ data.speed | kmh }}</div>
+							<div class="unit">км.ч.</div>
+						</div>
+						<piecircle pcurrent="data.speed" pmax="500" pborder="'#f0b840'"></piecircle>
 					</div>
 				</div>
 				
@@ -77,14 +89,8 @@
 				</div>
 			</div>
 			
-
-			<!-- FINISH SCREEN -->
-			<div ng-switch-when="finish">
-				<h1>finish</h1>
-			</div>	
-
 			<!-- START SCREEN -->
-  			<div ng-switch-default>
+  			<div ng-switch-when="start">
 				<ion-slide-box on-slide-changed="changeSport($index)">
 					<ion-slide ng-repeat="w in workouts" ng-class="w.tag">
 				    	<h1>{{w.name}}</h1>
@@ -92,9 +98,9 @@
 				</ion-slide-box>
 			</div>
 		</div>
+	</ion-content>
+  	
 
-
-  	</ion-content>
   	<div class="my-footer bar-assertive" ng-switch="state">
 		<!-- RUN SCREEN -->
 		<div ng-switch-when="run">

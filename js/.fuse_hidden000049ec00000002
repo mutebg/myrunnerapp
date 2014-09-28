@@ -11,16 +11,8 @@ app.factory('RunServ', function ($interval) {
 		'speed': 0,
 		'seconds': 0,
 		'km': 0,
-		'sport': '',
-		'energy': 0,
 		'track': []
 	}
-
-    var types = [
-        {tag:'run', name:'бягане'}, 
-        {tag:'bike', name:'колоездене'},
-        {tag:'walk', name:'ходене'}
-    ];
 
 	self.reset = function() {
 		navigator.geolocation.clearWatch( self.watchID );	
@@ -32,11 +24,12 @@ app.factory('RunServ', function ($interval) {
 		self.data = self.resetData;
 	}
 
-	self.start = function(sport){
+	self.start = function(){
 		self.reset();
-		self.running = true;
-		self.data.sport = sport;
+
 		self.data.seconds = 0;
+
+		self.running = true;
 		self.data.start_at = new Date().getTime();
 		self.timer = $interval( function(){
 			if ( self.running ) {
@@ -117,19 +110,6 @@ app.factory('RunServ', function ($interval) {
 	  return deg * (Math.PI/180)
 	}
 
-
-    self.getTypes = function() {
-        return types;
-    }
-
-    self.getType = function(search) {
-        for( var i = 0; i <= types.length; i++ ) {
-            if ( search == types[i].tag ) {
-                return types[i];
-            }
-        }
-    }
-
 	return self;
 });
 
@@ -141,19 +121,14 @@ app.factory('DB', function ($q) {
             name: 'workouts',
             columns: [
                 {name: 'id', type: 'integer primary key'},
-                {name: 'type', type: 'text'},
-                {name: 'added', type: 'integer'},
-                {name: 'seconds', type: 'integer'},
-                {name: 'track', type: 'text'},
-                {name: 'distance', type: 'integer'},
-                {name: 'energy', type: 'integer'},
-                {name: 'sync', type: 'integer'}
+                {name: 'title', type: 'text'},
+                {name: 'version', type: 'integer'}
             ]
         }
     ]
 
     self.init = function() {
-        self.db = window.openDatabase('myrunner', '1.1', 'database', -1);
+        self.db = window.openDatabase('myrunner', '1.0', 'database', -1);
  		angular.forEach(self.tables, function(table) {
             var columns = [];
  			
@@ -170,12 +145,12 @@ app.factory('DB', function ($q) {
     self.query = function(query, bindings) {
         bindings = typeof bindings !== 'undefined' ? bindings : [];
         var deferred = $q.defer();
-       	self.db.transaction(function(transaction) {
-       		transaction.executeSql(query, bindings, function(transaction, result) {
+ 
+        self.db.transaction(function(transaction) {
+            transaction.executeSql(query, bindings, function(transaction, result) {
                 deferred.resolve(result);
             }, function(transaction, error) {
-            	console.log(error);
-     			deferred.reject(error);
+                deferred.reject(error);
             });
         });
  
@@ -200,68 +175,9 @@ app.factory('DB', function ($q) {
 });
 
 app.factory('Workouts', function (DB) {
-	var self = this;
-	self.all = function() {
-		return DB.query('SELECT * FROM workouts ORDER BY id DESC')
-        .then( function( result ){
-            return DB.fetchAll( result );
-        });
-    };
 
-    self.get = function(id) {
-        return DB.query('SELECT * FROM workouts WHERE id = ?', [id])
-        .then(function(result){
-            return DB.fetch(result);
-        });
-    };
 
-    self.remove = function(id) {
-    	DB.query('DELETE FROM workouts WHERE id = ?',[id])
-    }
-
-    self.add = function(data) {
-    	var params = [data.sport, data.end_at, data.seconds, 
-    		JSON.stringify(data.track), data.km, data.energy];
-    	var sql = 'INSERT INTO workouts (type, added, seconds, track, distance, energy) ' + 
-    		'VALUES (?, ?, ?, ?, ?, ?)';
-    	DB.query(sql, params);
-    }
-
-    return self;
 });
 
-app.factory('Profile', function(){
-    var self = this;
-
-    self.get = function() {
-        var data = localStorage.getItem('profile');
-        var profile = JSON.parse(data);
-        if ( profile == null ) {
-            profile = {name: '', sex: 'm', weight: 0, height: 0, years: 0};
-        }
-        return profile;
-    }
-
-    self.update = function(data) {
-        localStorage.setItem('profile', JSON.stringify(data));
-    }
-
-    self.has = function() {
-        return localStorage.getItem('profile') ? true : false;
-    }
-
-    return self;
-});
-
-function energyCalc(seconds, distance, weight) {
-    var sport = 0.9;
-
-    var meterPerMin = ( distance / ( seconds / 60 ) );
-    console.log(meterPerMin);
-    var VO2 = ( 3.5 + ( meterPerMin * 0.2 ) + ( meterPerMin * 0.02 * sport ) );
-    console.log(VO2);
-    var MET = VO2 / 3.5;
-    console.log(MET);
-    var energy = MET * weight;
-    return energy;
-}
+//app.factory('RunServ', ['$interval', RunnerFactory]);
+//app.factory('RunStorage', [RunnerStorage]);
