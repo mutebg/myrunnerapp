@@ -55,3 +55,11 @@ app.filter('date', function() {
         return date.getDate() + ' ' + months[ date.getMonth() - 1];
     };
 });
+
+app.filter('kmPerHour', function(){
+    return function(distanceInKM, timeInSeconds) {
+        var timeInHours = timeInSeconds / 60 / 60;
+        var kmPerHour = distanceInKM / timeInHours;
+        return kmPerHour.toFixed(2);
+    }
+});

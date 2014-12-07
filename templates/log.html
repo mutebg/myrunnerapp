@@ -1,0 +1,39 @@
+<ion-view title="Калории">
+	<ion-nav-buttons side="left">
+		<button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+	</ion-nav-buttons>
+	<ion-content class="has-header">
+		<div class="angucomplete-holder">
+			<div class="list">
+				<label class="item item-input">
+					<input type="text" placeholder="Търсене" ng-keyup="searchProduct()" ng-model="search.value">
+				</label>
+			</div>
+			<div class="angucomplete-dropdown" ng-show="!selected">
+				<ul ng-show="search.list.length > 0 && search.value.length > 0">
+					<li class="angucomplete-row" ng-repeat="r in search.list" ng-click="show(r)">{{r.name}}</li>
+			  	</ul>
+			  	<div ng-show="search.list.length == 0 && search.value.length > 2">
+					няма  намерени продукти
+			  	</div>
+			</div>
+			<div ng-show="selected">
+				<input type="number" min="1" max="1000" value="100" ng-model="data.weight">
+			  	<h1>{{ data.energy = selected.cal / 100 * data.weight | number:0 }} kcal</h1>
+			  	<a class="button button-full button-positive" ng-click="save()">Добави</a>
+			</div>
+		</div>
+		
+		<!-- CURRENT LIST -->
+		<ion-list>
+		  	<ion-item class="item" ng-repeat="l in todayList">
+				<strong>{{ l.energy | number:0 }}</strong> kcal в {{ l.weight | number:0 }} гр. {{ l.name  }}
+
+				<ion-option-button ng-click="delete($index)" class="button-assertive">Изтриване</ion-option-button>
+		  	</ion-item>
+		  	<ion-item ng-show="getTotal() > 0">
+				<strong>общо днес: {{ getTotal() | number:0 }} kcal</strong>
+		  	</ion-item>
+		</ion-list>
+	</ion-content>
+</ion-view>

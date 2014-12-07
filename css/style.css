@@ -69,7 +69,7 @@ ion-view.pane {
 	bottom: 20%;
 	width: 100%;
 	text-align: center;
-	font-size: 60px;
+	font-size: 52px;
 	color: #145fd7;
 }
 
@@ -120,7 +120,6 @@ ion-view.pane {
 	height: 0;
 	padding-bottom: 80%;
 	margin: 2em auto;
-	
 }
 
 .circle-big.border {
@@ -226,4 +225,56 @@ piecircle {
     background: inherit;
     opacity: 1;
     z-index: 300;
+}
+
+.input-auto {
+	width: 100%;
+	padding: 10px;
+}
+
+.form-control {
+    outline: 0;
+    border-color: #ECECEC;
+    border-style: solid;
+    border-width: 1px;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 20px 10px !important;
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.angucomplete-holder {
+    position: relative;
+    width: 100%;
+}
+
+.angucomplete-dropdown {
+    border-color: #ececec;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    width: 100%;
+    cursor: pointer;
+    z-index: 9999;
+    position: absolute;
+    top: 47px;
+    left: 0px;
+    background-color: #ececec;
+}
+
+.angucomplete-searching {
+    color: #acacac;
+    font-size: 14px;
+}
+
+.angucomplete-description {
+    font-size: 14px;
+}
+
+.angucomplete-row {
+    padding: 5px;
+    color: #000000;
+    margin-bottom: 4px;
+	border-bottom: 1px solid #ccc;
 }

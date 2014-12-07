@@ -6,7 +6,7 @@
     	<ion-list>					
 		  	<ion-item class="item item-icon-left" href="#/app/history/{{w.id}}" ng-repeat="w in list">
 		    	<i class="icon"><img src="img/{{ w.type }}.svg" width="32" /></i>
-		    	{{ w.distance | m }} метра за {{ w.seconds | mmss  }} на	 {{ w.added | date }}
+		    	{{ w.distance | m }} метра за {{ w.seconds | mmss  }} на {{ w.added | date }}
 
 		    	<ion-option-button ng-click="delete($index)" class="button-assertive">Изтриване</ion-option-button>
 		  	</ion-item>

@@ -1,10 +1,11 @@
-app.factory('RunServ', function ($interval) {
+app.factory('RunServ', function ($interval, Profile) {
 	var self = {};
 	self.watchID = null;
 	self.running = false;
 	self.timer;
 	self.temp;
 	self.data = {};
+    self.bodyweight;
 	self.resetData = {
 		'start_at': null,
 		'end_at': null,
@@ -35,7 +36,8 @@ app.factory('RunServ', function ($interval) {
 	self.start = function(sport){
 		self.reset();
 		self.running = true;
-		self.data.sport = sport;
+        self.bodyweight =  Profile.get()['weight'];
+        self.data.sport = sport;
 		self.data.seconds = 0;
 		self.data.start_at = new Date().getTime();
 		self.timer = $interval( function(){
@@ -87,6 +89,7 @@ app.factory('RunServ', function ($interval) {
 	}
 
 	self.getTrack = function() {
+        self.data.energy = calculateEnergy(self.bodyweight, self.data.km, (self.data.seconds / 60), 0 );
 		return self.data;
 	}
 
@@ -96,7 +99,7 @@ app.factory('RunServ', function ($interval) {
 			'speed': lastData.speed,
 			'distance': lastData.km,
 			'time': lastData.seconds,
-			'energy': 123//energy
+			'energy': calculateEnergy(self.bodyweight, lastData.km, (lastData.seconds / 60), 0 )
 		}
 	}
 
@@ -148,6 +151,16 @@ app.factory('DB', function ($q) {
                 {name: 'distance', type: 'integer'},
                 {name: 'energy', type: 'integer'},
                 {name: 'sync', type: 'integer'}
+            ]
+        },
+        {
+            name: 'log',
+            columns: [
+                {name: 'id', type: 'integer primary key'},
+                {name: 'name', type: 'text'},
+                {name: 'weight', type: 'integer'},
+                {name: 'energy', type: 'integer'},
+                {name: 'added', type: 'varchar(10)'},
             ]
         }
     ]
@@ -230,6 +243,30 @@ app.factory('Workouts', function (DB) {
     return self;
 });
 
+app.factory('Log', function (DB) {
+    var self = this;
+
+    self.add = function(data) {
+        var params = [data.name, data.energy, data.weight, data.date];
+        var sql = 'INSERT INTO log (name, energy, weight, added) ' + 
+            'VALUES (?, ?, ?, ?)';
+        DB.query(sql, params);
+    }
+
+    self.getDay = function(day) {
+        return DB.query('SELECT * FROM log WHERE added = ?', [day])
+        .then(function(result){
+            return DB.fetchAll( result );
+        });
+    }
+
+    self.remove = function(id) {
+        DB.query('DELETE FROM log WHERE id = ?',[id])
+    }
+
+    return self;
+});
+
 app.factory('Profile', function(){
     var self = this;
 
@@ -253,15 +290,31 @@ app.factory('Profile', function(){
     return self;
 });
 
-function energyCalc(seconds, distance, weight) {
-    var sport = 0.9;
+function calculateEnergy(weight, distance, time,  grade) {
+    if ( !weight || !distance || !time ) {
+        return 0;
+    }
 
-    var meterPerMin = ( distance / ( seconds / 60 ) );
-    console.log(meterPerMin);
-    var VO2 = ( 3.5 + ( meterPerMin * 0.2 ) + ( meterPerMin * 0.02 * sport ) );
-    console.log(VO2);
-    var MET = VO2 / 3.5;
-    console.log(MET);
-    var energy = MET * weight;
-    return energy;
+    distance = kmToMi(distance);
+    weight = kgToLbs(weight);
+    var speed = distance / time * 60;
+    var speedmpm = 60 / speed;
+    
+    if (speed < 4) {
+        var mets = (((((weight / 2.2) * time * (3.5 + (1.8 * grade * .01 * (speed * 26.8)) + ((speed * 26.8) * .1))) + (3.5 * (weight / 2.2))) / 3.5) / (weight / 2.2)) / time;
+        var totalcalories = ((((weight / 2.2) * time * (3.5 + (1.8 * grade * .01 * (speed * 26.8)) + ((speed * 26.8) * .1))) + (3.5 * (weight / 2.2))) / 1000) * 5;
+    } else {
+        var mets = (((((weight / 2.2) * time * (3.5 + (.9 * grade * .01 * (speed * 26.8)) + ((speed * 26.8) * .2))) + (3.5 * (weight / 2.2))) / 3.5) / (weight / 2.2)) / time;
+        var totalcalories = ((((weight / 2.2) * time * (3.5 + (.9 * grade * .01 * (speed * 26.8)) + ((speed * 26.8) * .2))) + (3.5 * (weight / 2.2))) / 1000 ) * 5;
+    }
+        
+    return totalcalories.toFixed(0);
+}
+
+function kgToLbs(kg) {
+    return kg * 2.20462;
+}
+
+function kmToMi(km){
+    return km * 0.621371;
 }

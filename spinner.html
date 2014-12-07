@@ -1,0 +1,94 @@
+<style>
+* { 
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.piecircle-wrapper {
+    width: 80%;
+    padding-bottom: 80%;
+    position: relative;
+    background: white;
+}
+
+.piecircle-pie {
+    width: 50%;
+    height: 100%;
+    transform-origin: 100% 50%;
+    position: absolute;
+    border: 5px solid #ccc;
+}
+
+.piecircle-spinner {
+    border-radius: 100% 0 0 100% / 50% 0 0 50%;
+    z-index: 200;
+    border-right: none;
+}
+
+.piecircle-filler {
+    border-radius: 0 100% 100% 0 / 0 50% 50% 0;
+    left: 50%;
+    opacity: 0;
+    z-index: 100;
+    border-left: none;
+}
+
+.piecircle-mask {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    background: inherit;
+    opacity: 1;
+    z-index: 300;
+}
+</style>
+
+<body ng-app="myApp">
+    <input ng-model="cur">{{cur}}
+    <piecircle pcurrent="cur" pmax="60" pborder="'8AC007'"></piecircle>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+    <script>
+    var app = angular.module('myApp', []);
+    app.directive('piecircle', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                pcurrent: '=',
+                pmax: '=',
+                pborder: '='
+            },
+            template: ' <div class="piecircle-wrapper"><div class="piecircle-spinner piecircle-pie"></div><div class="piecircle-filler piecircle-pie"></div><div class="piecircle-mask"></div></div>',
+            link: function ($scope, element, attrs) { 
+                var divs = element.find('div');
+                var spinner = divs[1];
+                var filler = divs[2];
+                var mask = divs[3];
+                
+                $scope.$watch('pcurrent', function(value){
+                    value = parseFloat(value);
+
+                    if ( value > $scope.pmax ) {
+                        value = $scope.pmax;
+                    }
+
+                    if ( isNaN(value) || value < 0 ) {
+                        value = 0;
+                    }
+
+                    var deg = ( value / parseFloat($scope.pmax) ) * 360;
+                    spinner.style.borderColor = $scope.pborder;
+                    filler.style.borderColor = $scope.pborder;
+
+                    spinner.style.transform =  'rotate(' + deg + 'deg)';
+                    filler.style.opacity = deg > 180 ? 1 : 0;
+                    mask.style.opacity = deg < 180 ? 1 : 0;
+                    
+                });
+            }            
+        }
+    });
+    </script>
+</body>

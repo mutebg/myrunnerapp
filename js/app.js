@@ -23,10 +23,10 @@ app.run(function($ionicPlatform, DB) {
 app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
         .state('app', {
-              url: "/app",
-              abstract: true,
-              templateUrl: "templates/menu.html",
-              controller: 'AppCtrl'
+            url: "/app",
+            abstract: true,
+            templateUrl: "templates/menu.html",
+            controller: 'AppCtrl'
         })
 
         .state('app.start', {
@@ -65,6 +65,36 @@ app.config(function($stateProvider, $urlRouterProvider) {
                 'menuContent' :{
                     templateUrl: "templates/profile.html",
                     controller: 'ProfileCtrl'
+                }
+            }
+        })
+
+        .state('app.help', {
+            url: "/help",
+            views: {
+                'menuContent' :{
+                    templateUrl: "templates/help.html",
+                    controller: 'HelpCtrl'
+                }
+            }
+        })
+
+        .state('app.forum', {
+            url: "/forum",
+            views: {
+                'menuContent' :{
+                    templateUrl: "templates/forum.html",
+                    controller: 'ForumCtrl'
+                }
+            }
+        })
+
+        .state('app.log', {
+            url: "/log",
+            views: {
+                'menuContent' :{
+                    templateUrl: "templates/log.html",
+                    controller: 'LogCtrl'
                 }
             }
         })

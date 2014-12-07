@@ -45,7 +45,6 @@ app.controller('StartCtrl', function($scope, $interval, RunServ, Workouts) {
     $scope.save = function() {
         $scope.data = $scope.clearData;
         var track = RunServ.getTrack();
-        console.log(track);
         Workouts.add(track);
         $scope.state = 'start';
     }
@@ -68,12 +67,10 @@ app.controller('HistoryCtrl', function( $scope, Workouts ) {
     }
 })
 
-app.controller('HistoryViewCtrl', function($scope, $stateParams, $filter, Workouts, RunServ) {
+app.controller('HistoryViewCtrl', function($scope, $stateParams, Workouts, RunServ) {
     $scope.workout = {};
     Workouts.get(  $stateParams.workoutid ).then( function( workout ) {
         $scope.workout = workout;
-        console.log(workout);
-        $scope.workout.speed = $filter('kmPerHour')(workout.distance, workout.seconds);
         $scope.workout.type_name = RunServ.getType(workout.type).name;
         /*var track = JSON.parse( workout.track );
         angular.forEach(track, function(value, key) {
@@ -92,39 +89,41 @@ app.controller('ProfileCtrl', function($scope, Profile) {
 });
 
 app.controller('LogCtrl', function($scope, $http, Log) {
-    $scope.search = {list:[], value:''};
+    $scope.searchList = [];
     $scope.todayList = [];
     $scope.selected;
+    $scope.value = '';
     $scope.data = {
         'energy': 0,
         'weight': 100,
         'name': false
     }
 
-    $scope.searchProduct = function() {
-        if ( $scope.search.value.length > 2 ) {
-            var url = 'http://stoyandelev.com/projects/caloriesdb/search.php?callback=JSON_CALLBACK&q=' + $scope.search.value;
-            $http.jsonp( url ).then( function(result){
-                $scope.search.list = result.data;
+    $scope.search = function(value) {
+        if ( value.length > 2 ) {
+            var url = 'http://localhost/caloriesdb/search.php?q=' + value;
+            $http.get( url ).then( function(result){
+                $scope.searchList = result.data;
+                $scope.value = value;
+                console.log($scope.searchList, $scope.value);
             });
         }
     }
 
     $scope.show = function(product) {
-        $scope.search.value = product.name;
         $scope.selected = product;
     }
     
     $scope.save = function() {
-        
         var date = new Date();
         $scope.data.date = date.getFullYear() + '-' + ( date.getMonth() + 1 ) + '-' +  date.getDate();
         $scope.data.name = $scope.selected.name;
-        Log.add($scope.data);
+        console.log($scope.data);
         $scope.selected = null;
-        $scope.search.value = null;
-        $scope.search.list = [];
-        $scope.data.weight = 100;
+        $scope.value = '';
+        $scope.searchList = [];
+
+        Log.add($scope.data);
         $scope.getToday();
     }
 
